@@ -52,6 +52,7 @@ public class EmailService {
     /**
      * Notify owner about a new contact message.
      */
+    @Async
     public void notifyNewContactMessage(String name, String email, String messageText) {
         String subject = "📬 New Portfolio Contact: " + name;
         String body = String.format(
@@ -72,6 +73,7 @@ public class EmailService {
     /**
      * Notify owner about a new meeting booking.
      */
+    @Async
     public void notifyNewMeetingBooking(String name, String email, String topic, String date, String time) {
         String startGCal = date.replace("-", "") + "T" + time.replace(":", "") + "00";
         String endGCal = startGCal;
