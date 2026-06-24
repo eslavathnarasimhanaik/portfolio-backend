@@ -73,6 +73,38 @@ public class EmailService {
      * Notify owner about a new meeting booking.
      */
     public void notifyNewMeetingBooking(String name, String email, String topic, String date, String time) {
+        String startGCal = date.replace("-", "") + "T" + time.replace(":", "") + "00";
+        String endGCal = startGCal;
+        try {
+            String[] timeParts = time.split(":");
+            int hour = Integer.parseInt(timeParts[0]);
+            int min = Integer.parseInt(timeParts[1]);
+            min += 30;
+            if (min >= 60) {
+                min -= 60;
+                hour += 1;
+                if (hour >= 24) {
+                    hour = 0;
+                }
+            }
+            String endHour = String.format("%02d", hour);
+            String endMin = String.format("%02d", min);
+            endGCal = date.replace("-", "") + "T" + endHour + endMin + "00";
+        } catch (Exception e) {
+            // fallback
+        }
+
+        String gcalUrl = "";
+        try {
+            gcalUrl = "https://calendar.google.com/calendar/render?action=TEMPLATE" +
+                "&text=" + java.net.URLEncoder.encode("Meeting with " + name + ": " + topic, java.nio.charset.StandardCharsets.UTF_8) +
+                "&dates=" + startGCal + "/" + endGCal +
+                "&details=" + java.net.URLEncoder.encode("Hi " + name + ",\n\nThanks for booking a meeting. Topic: " + topic + "\n\nThis meeting is scheduled to use Google Meet. Please save this event to your calendar to automatically generate the Google Meet link and invite both of us.", java.nio.charset.StandardCharsets.UTF_8) +
+                "&add=" + java.net.URLEncoder.encode("narasimhanaik591@gmail.com," + email, java.nio.charset.StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            gcalUrl = "https://calendar.google.com/calendar/render?action=TEMPLATE";
+        }
+
         String subject = "📅 New Meeting Booking: " + name + " — " + topic;
         String body = String.format(
             "New meeting booking received!\n\n" +
@@ -84,9 +116,11 @@ public class EmailService {
             "Preferred Time: %s\n" +
             "Status: PENDING\n" +
             "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" +
+            "Add to Google Calendar & automatically generate Google Meet link:\n" +
+            "%s\n\n" +
             "View all bookings: http://localhost:8080/admin\n" +
             "API: http://localhost:8080/api/meetings",
-            name, email, topic, date, time
+            name, email, topic, date, time, gcalUrl
         );
         sendNotification(subject, body);
     }
