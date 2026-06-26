@@ -24,6 +24,9 @@ public class EmailService {
     @Value("${spring.mail.username:}")
     private String fromEmail;
 
+    @Value("${portfolio.backend.base-url:https://portfolio-backend-d47l.onrender.com}")
+    private String backendBaseUrl;
+
     /**
      * Sends an email notification asynchronously.
      * If mail sender is not configured, logs and skips silently.
@@ -63,9 +66,9 @@ public class EmailService {
             "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" +
             "Message:\n%s\n\n" +
             "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
-            "View all messages: http://localhost:8080/admin\n" +
-            "API: http://localhost:8080/api/contact",
-            name, email, messageText
+            "View all messages: %s/admin\n" +
+            "API: %s/api/contact",
+            name, email, messageText, backendBaseUrl, backendBaseUrl
         );
         sendNotification(subject, body);
     }
@@ -120,9 +123,9 @@ public class EmailService {
             "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" +
             "Add to Google Calendar & automatically generate Google Meet link:\n" +
             "%s\n\n" +
-            "View all bookings: http://localhost:8080/admin\n" +
-            "API: http://localhost:8080/api/meetings",
-            name, email, topic, date, time, gcalUrl
+            "View all bookings: %s/admin\n" +
+            "API: %s/api/meetings",
+            name, email, topic, date, time, gcalUrl, backendBaseUrl, backendBaseUrl
         );
         sendNotification(subject, body);
     }
